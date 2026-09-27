@@ -3,6 +3,10 @@
 #include <PxPhysicsAPI.h>
 #include <cmath>
 
+
+// TODO: pasar a Utils/
+
+
 class Vector3D {
 
 private:
@@ -28,32 +32,37 @@ public:
 
 	// Devuelve un Vector3D normalizado
 	inline Vector3D normalize() const {
-		float mag = magnitude();
-		return Vector3D(x / mag, y / mag, z / mag);
+		return *this / magnitude(); // se asume que el vector de entrada NUNCA será nulo
 	}
 
-	inline Vector3D& operator= (const Vector3D& v) {
-		return Vector3D(x = v.x, y = v.y, z = v.z);
-	}
-
-	inline Vector3D& operator+ (const Vector3D& v) {
+	inline Vector3D operator+ (const Vector3D& v) const {
 		return Vector3D(x + v.x, y + v.y, z + v.z);
 	}
 
-	inline Vector3D& operator- (const Vector3D& v) {
+	inline Vector3D operator- (const Vector3D& v) const {
 		return Vector3D(x - v.x, y - v.y, z - v.z);
 	}
 
-	inline Vector3D& operator* (float n) {
+	inline Vector3D operator* (float n) const {
 		return Vector3D(x * n, y * n, z * n);
 	}
 
-	inline Vector3D& operator/ (float n) {
+	inline Vector3D operator/ (float n) const {
 		return Vector3D(x / n, y / n, z / n);
 	}
 
 	inline Vector3D& operator+= (const Vector3D& v) {
-		return Vector3D(x += v.x, y+= v.y, z += v.z);
+		x += v.x;
+		y += v.y;
+		z += v.z;
+		return *this;
+	}
+
+	inline Vector3D& operator*= (float n) {
+		x *= n;
+		y *= n;
+		z *= n;
+		return *this;
 	}
 
 	// Producto escalar
@@ -62,7 +71,7 @@ public:
 	}
 
 	// Producto vectorial
-	inline Vector3D& cross(const Vector3D& v) const {
+	inline Vector3D cross(const Vector3D& v) const {
 		return Vector3D(y * v.z - z * v.y, x * v.z - z * v.x, x * v.y - y * v.x);
 	}
 

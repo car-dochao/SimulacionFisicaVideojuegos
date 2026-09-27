@@ -34,26 +34,27 @@ void SceneManager::applyPendingSceneChange() {
 // Llamada por frame: aplica el cambio pendiente antes de actualizar la escena
 // para evitar modificar la escena mientras está siendo usada.
 void SceneManager::update(double dt) {
-    if (m_hasPendingChange) {
+    if (m_hasPendingChange)
         applyPendingSceneChange();
-    }
 
-    if (m_currentScene) {
+    if (m_currentScene)
         m_currentScene->update(dt);
-    }
 }
 
 // Reenvía eventos de teclado a la escena actual. Mantener este método simple
 // permite centralizar atajos globales si se desea en el futuro.
 void SceneManager::keyPress(unsigned char key, const physx::PxTransform& cameraTransform) {
     // Teclas globales de navegación entre prácticas
-    if (key == '0') {
+    switch (key) {
+    case '0':
         changeScene("Scene0");
         return; // Consumimos el evento para que no interfiera con la escena
+    case '1':
+        changeScene("Scene1");
+        return;
     }
 
     // Si no es una tecla de navegación global, se la pasamos a la escena activa
-    if (m_currentScene != nullptr) {
+    if (m_currentScene != nullptr)
         m_currentScene->keyPress(key, cameraTransform);
-    }
 }
