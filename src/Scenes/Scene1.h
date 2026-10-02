@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "RenderUtils.hpp"
+#include "Vector3D.h"
 
 class Particle;
 
@@ -12,8 +13,15 @@ private:
     std::vector<RenderItem*> m_renderItems;
     std::vector<Particle*> m_particles;
 
+    // atributos de la escena (disparo, gravedad)
+    float shoot_mass;
+    float shoot_velocity;
+    Vector3D gravity;
+
+    void shoot(); // dispara un proyectil desde la cámara
+
 public:
-    explicit Scene1(std::string name) : Scene(std::move(name)) {}
+    explicit Scene1(std::string name);
 
     void init() override;
     void update(double dt) override;

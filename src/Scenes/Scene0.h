@@ -10,7 +10,7 @@ private:
     std::vector<RenderItem*> m_renderItems;
 
 public:
-    explicit Scene0(std::string name) : Scene(std::move(name)) {}
+    explicit Scene0(std::string name);
 
     void init() override;
     void update(double dt) override;

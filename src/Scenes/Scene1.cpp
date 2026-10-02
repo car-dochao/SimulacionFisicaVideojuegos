@@ -4,9 +4,20 @@
 #include "Particle.h"
 #include "Projectile.h"
 
+Scene1::Scene1(std::string name) : 
+    Scene(name), shoot_mass(10.0f), shoot_velocity(10.0f),
+    gravity(0, -9.8f, 0) {
+
+}
+
 void Scene1::init() {
     // Añadimos una partícula
-    m_particles.push_back(new Particle({0, 0, 0}, {2, 0, 0})); // velocidad 2m/s?
+    //m_particles.push_back(new Particle({0, 0, 0}, {2, 0, 0})); // velocidad 2m/s?
+
+    // Esfera que sirve como diana
+    physx::PxShape* sphere = CreateShape(physx::PxSphereGeometry(1.0f));
+    m_transform = physx::PxTransform(physx::PxVec3(0.0f, 10.0f, 0.0f));
+    m_renderItems.push_back(new RenderItem(sphere, &m_transform, Vector4(1.0f, 0.1f, 0.1f, 1.0f)));
 }
 
 void Scene1::update(double dt) {
@@ -28,35 +39,25 @@ void Scene1::cleanup() {
 void Scene1::keyPress(unsigned char key, const physx::PxTransform& cameraTransform) {
     // Teclas globales de navegación entre prácticas
     switch (key) {
-    case 'E': // disparar
-        // creamos una particula y le aplicamos una fuerza
-        // quaternion a vector3d 
-        Vector3D direction = cameraTransform.q.rotate(Vector3D(0, 0, -1));
-
-        // calculamos la velocidad segun a donde mira la cámara?
-        m_particles.push_back(Projectile(cameraTransform.p, direction.normalize(), 1.0));
-        return; // Consumimos el evento para que no interfiera con la escena
-
-    case 'O': // elevar masa del proximo proyectil
+    case 'e': // disparar proyectil
+        shoot();
         return;
-
-    case '': // restar masa del proximo proyectil
+    case 'm': // elevar masa del proximo proyectil
+        shoot_mass++;
         return;
-
-    case '': // sumar velocidad del proximo proyectil
+    case 'M': // restar masa del proximo proyectil (shift + m)
+        shoot_mass--;
         return;
-
-    case '': // restar velociadd del proximo proyectil
+    case 'v': // sumar velocidad del proximo proyectil
+        shoot_velocity++;
+        return;
+    case 'V': // restar velociad del proximo proyectil (shift + V)
+        shoot_velocity--;
         return;
     }
 }
 
-void Scene1::shoot(Vector3D pos, Vector3D direction, float speed, float gravity, float damp, float mass) {
-    float adjusted_speed = maths::remap(s);
-    Vector3D adjusted_velocity = adjusted_speed * direction.normalize();
-    float adjusted_mass = mass * std::pow(speed / adjusted_speed, 2);
-    float adjusted_gravity = gravity * std::pow(adjusted_speed / speed, 2);
-    Vector3D adjusted_acceleration = Vector3D(0.0f, adjusted_gravity, 0.0f);
-
-    particle_vector.push_back(new Particle(pos, adjusted_velocity, adjusted_acceleration, 0.98f, adjusted_mass));
+void Scene1::shoot() {
+    Vector3D direction = (Vector3D(GetCamera()->getDir()).normalize() * shoot_velocity);
+    m_particles.push_back(new Projectile(GetCamera()->getEye(), direction, shoot_mass));
 }

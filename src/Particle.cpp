@@ -24,7 +24,6 @@ void Particle::applyForce(float force, Vector3D direction) {
 
 
 void Particle::update(double t) {
-
 	// integrate
 	switch (intg_type) {
 	case IntegratorType::Euler: intg_euler(t); break;
