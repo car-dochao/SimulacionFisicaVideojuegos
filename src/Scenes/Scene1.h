@@ -18,4 +18,5 @@ public:
     void init() override;
     void update(double dt) override;
     void cleanup() override;
+    void keyPress(unsigned char key, const physx::PxTransform& cameraTransform) override;
 };

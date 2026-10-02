@@ -13,7 +13,6 @@ private:
 	physx::PxTransform transform; // transform de nuestra particula, position + quaternion
 	Vector3D lastPos; // para Verlet
 
-	float mass = 1.0f;
 	float damping = 0.98; // valor por defecto del damping
 
 public:
@@ -22,8 +21,9 @@ public:
 	Particle(Vector3D position, Vector3D velocity, float damping = 0.98, IntegratorType type = IntegratorType::Euler);
 	~Particle();
 
-	void integrate(double t);
-	void applyForce(float force, Vector3D direction);
+	virtual void update(double t);
+	
+	virtual void applyForce(float force, Vector3D direction);
 
 private:
 	IntegratorType intg_type; // por defecto Euler según ctra
