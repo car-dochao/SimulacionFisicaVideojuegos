@@ -3,19 +3,19 @@
 #include "Scene.h"
 #include "RenderUtils.hpp"
 #include "Vector3D.h"
+#include "Particle.h"
 
-class Particle;
 
 class Scene1 : public Scene {
 
 private:
-    physx::PxTransform m_transform;
     std::vector<RenderItem*> m_renderItems;
     std::vector<Particle*> m_particles;
 
-    // atributos de la escena (disparo, gravedad)
-    float shoot_mass;
-    float shoot_velocity;
+    float real_mass;
+    float real_velocity;
+    float sim_velocity;
+
     Vector3D gravity;
 
     void shoot(); // dispara un proyectil desde la cámara

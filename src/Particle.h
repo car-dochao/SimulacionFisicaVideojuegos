@@ -5,31 +5,38 @@
 
 class Particle {
 
-private:
-	RenderItem* item;
+protected:
+
+	float mass;
+	float damping;
 
 	Vector3D velocity;
 	Vector3D acceleration;
-	physx::PxTransform transform; // transform de nuestra particula, position + quaternion
-	Vector3D lastPos; // para Verlet
 
-	float damping = 0.98; // valor por defecto del damping
+	physx::PxTransform transform; // position & quaternion
 
 public:
 	enum class IntegratorType { Euler, SemiEuler, Verlet };
 
-	Particle(Vector3D position, Vector3D velocity, float damping = 0.98, IntegratorType type = IntegratorType::Euler);
-	~Particle();
+	Particle(Vector3D position, Vector3D velocity, float mass = 1.f, float damping = 0.98f,
+		IntegratorType type = IntegratorType::Euler);
+
+	virtual ~Particle();
 
 	virtual void update(double t);
-	
 	virtual void applyForce(float force, Vector3D direction);
 
 private:
-	IntegratorType intg_type; // por defecto Euler según ctra
+	RenderItem* item;
+
+	IntegratorType intg_type; // por defecto Euler (ctra)
 
 	// métodos para cada tipo de integrador
 	void intg_euler(double t);
 	void intg_semiEuler(double t);
 	void intg_verlet(double t);
+
+	// para verlet
+	bool integrated;
+	Vector3D last_pos;
 };

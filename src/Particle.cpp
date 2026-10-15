@@ -1,25 +1,22 @@
 #include "Particle.h"
 #include <cmath>
 
-Particle::Particle(Vector3D position, Vector3D velocity, float damping, IntegratorType type)
-	: transform(position), velocity(velocity), acceleration(0, 0, 0), damping(damping), intg_type(type) // acc nula!
-	{ // TODO: calcular p0 con EulerSemiImplícito, siguiente integración Verlet (bool firstIntegration?)
+Particle::Particle(Vector3D position, Vector3D velocity, float mass, float damping,
+	IntegratorType type): mass(mass), damping(damping), velocity(velocity),
+	acceleration(0, 0, 0), transform(position), intg_type(type) { // TODO: calcular last_pos con EulerSemiImplícito, siguiente integración Verlet (bool firstIntegration?)
 	// Creamos una esfera y un render item con dicha geometría
-	physx::PxShape* sphere = CreateShape(physx::PxSphereGeometry(1.0f));
-	item = new RenderItem(sphere, &transform, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	item = new RenderItem(CreateShape(physx::PxSphereGeometry(1.0f)), &transform, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+	item->shape->release(); // libera la referencia inicial de CreateShape; el RenderItem conserva la suya
 }
 
 Particle::~Particle() {
-	//delete render item??
 	item->release();
 }
 
-// provisional: aplicar una fuerza (en newtons) en una dirección específica
+// Aplica una fuerza (en newtons) durante el siguiente paso de integración
 void Particle::applyForce(float force, Vector3D direction) {
-	// modificaremos la aceleración sumando a su vector un direction normalizado * force? (o tal vez normalizar todo despues?)
-	// aceleración = fuerza/masa (asumimos masa  de 1kg?)
-	acceleration += (direction.normalize() * force); // TODO: añadir masa a la particula?	
-	// restaurar un frame mas adelante la acceleración a 0?
+	// aceleración = fuerza / masa
+	acceleration += direction.normalize() * (force / mass);
 }
 
 
@@ -30,6 +27,8 @@ void Particle::update(double t) {
 	case IntegratorType::SemiEuler: intg_semiEuler(t); break;
 	case IntegratorType::Verlet: intg_verlet(t); break;
 	}
+
+	acceleration = Vector3D(0, 0, 0); // restaurar acc a 0 (ya que las fuerzas se aplican en cada "step")
 }
 
 void Particle::intg_euler(double t) {
@@ -48,8 +47,9 @@ void Particle::intg_semiEuler(double t) {
 
 void Particle::intg_verlet(double t) {
 	// Verlet (nueva pos respecto la anterior y la aceleración)
-	Vector3D position(transform.p);
-	transform.p = position + (position - lastPos) * damping + acceleration * t * t;
-	velocity = (transform.p - position) / t;
-	lastPos = position;
+	// TODO: queda por intergar primero con otro (bool integrated)
+	// Vector3D position(transform.p);
+	// transform.p = position + (position - last_pos) * damping + acceleration * t * t;
+	// velocity = (transform.p - position) / t;
+	// last_pos = position;
 }

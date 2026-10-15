@@ -3,9 +3,12 @@
 
 class Projectile : public Particle {
 protected:
-	float mass = 1.0f;
+	Vector3D gravity; // gravedad simulada del proyectil
+
 public:
-	Projectile(Vector3D position, Vector3D velocity, float mass, float damping = 0.98, IntegratorType type = IntegratorType::SemiEuler);
+	Projectile(Vector3D position, Vector3D direction, float real_mass,
+		Vector3D gravity, float sim_velocity, float real_velocity,
+		float damping = 1.f, IntegratorType type = IntegratorType::SemiEuler);
 
 	void update(double t) override;
 };

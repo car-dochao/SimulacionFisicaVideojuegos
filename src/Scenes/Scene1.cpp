@@ -4,10 +4,10 @@
 #include "Particle.h"
 #include "Projectile.h"
 
-Scene1::Scene1(std::string name) : 
-    Scene(name), shoot_mass(10.0f), shoot_velocity(10.0f),
-    gravity(0, -9.8f, 0) {
-
+Scene1::Scene1(std::string name) :
+    Scene(name),
+    // bala de cañón (500m/s y 6kg)
+    real_mass(6.f), real_velocity(500.f), sim_velocity(50.f), gravity(0, -9.8f, 0) {
 }
 
 void Scene1::init() {
@@ -15,9 +15,8 @@ void Scene1::init() {
     //m_particles.push_back(new Particle({0, 0, 0}, {2, 0, 0})); // velocidad 2m/s?
 
     // Esfera que sirve como diana
-    physx::PxShape* sphere = CreateShape(physx::PxSphereGeometry(1.0f));
-    m_transform = physx::PxTransform(physx::PxVec3(0.0f, 10.0f, 0.0f));
-    m_renderItems.push_back(new RenderItem(sphere, &m_transform, Vector4(1.0f, 0.1f, 0.1f, 1.0f)));
+    physx::PxTransform m_transform = physx::PxTransform(physx::PxVec3(0.0f, 10.0f, 0.0f));
+    m_renderItems.push_back(new RenderItem(CreateShape(physx::PxSphereGeometry(1.0f)), &m_transform, Vector4(1.0f, 0.1f, 0.1f, 1.0f)));
 }
 
 void Scene1::update(double dt) {
@@ -34,6 +33,9 @@ void Scene1::cleanup() {
 
     for (Particle* particle : m_particles)
         if (particle) delete particle;
+
+    m_renderItems.clear();
+    m_particles.clear();
 }
 
 void Scene1::keyPress(unsigned char key, const physx::PxTransform& cameraTransform) {
@@ -43,21 +45,26 @@ void Scene1::keyPress(unsigned char key, const physx::PxTransform& cameraTransfo
         shoot();
         return;
     case 'm': // elevar masa del proximo proyectil
-        shoot_mass++;
-        return;
+        real_mass += 1.f;
+        break;
     case 'M': // restar masa del proximo proyectil (shift + m)
-        shoot_mass--;
-        return;
+        real_mass -= 1.f;
+        break;
     case 'v': // sumar velocidad del proximo proyectil
-        shoot_velocity++;
-        return;
-    case 'V': // restar velociad del proximo proyectil (shift + V)
-        shoot_velocity--;
+        real_velocity += 20.f;
+        break;
+    case 'V': // restar velocidad del proximo proyectil (shift + v)
+        real_velocity -= 20.f;
+        break;
+    default:
         return;
     }
 }
 
 void Scene1::shoot() {
-    Vector3D direction = (Vector3D(GetCamera()->getDir()).normalize() * shoot_velocity);
-    m_particles.push_back(new Projectile(GetCamera()->getEye(), direction, shoot_mass));
+    Vector3D position = GetCamera()->getEye();
+    Vector3D direction = GetCamera()->getDir();
+
+    m_particles.push_back(new Projectile(position, direction, real_mass,
+        gravity, sim_velocity, real_velocity));
 }

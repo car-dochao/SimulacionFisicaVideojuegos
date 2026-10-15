@@ -15,3 +15,5 @@ obj/
 # Mis movidas de vscode
 .vscode/
 build/
+/.zed
+.clangd
